@@ -39,29 +39,8 @@ jobs:
           fetch-depth: 0 # default is 1
           ref: "${{ github.ref }}"
 
-      - name: Find changed recipes
-        id: find
-        shell: bash
-        run: |
-          ref="${{ github.ref_name == 'master' && 'HEAD~1' || 'origin/master' }}"
-          if [ "${{ inputs.all }}" = true ]; then
-            files=`ls -d recipes/*`
-          else
-            files=`git diff --name-only $ref`
-          fi
-
-          recipes=$(echo $files |
-            tr ' ' '\n' |
-            grep 'recipes/[^\.]*$' |
-            sed 's|recipes/\(.*\)|\1|g' |
-            tr '\n' ' ')
-
-          echo $recipes
-          if [ ! -z "$recipes" ]; then
-            echo "recipes=$recipes">> $GITHUB_OUTPUT
-          fi
-          
       - name: build libs
+        shell: bash
         run: ./build.sh ${{ inputs.recipes }}
 
       - name: Collect
